@@ -1,7 +1,10 @@
 import CryptoJS from 'crypto-js';
 import { EncryptedData } from '../types';
 
-const ENCRYPTION_KEY = 'authenticator-secret-key-2024'; // In production, derive from user password
+// NOTE: In production, derive the key from a user-provided password
+// stored via a Keychain/Keystore plugin (e.g. @capacitor/preferences with
+// secure storage, or a custom native implementation).
+const ENCRYPTION_KEY = 'authenticator-secret-key-2024';
 
 export const encryptionService = {
   encrypt(data: string): EncryptedData {

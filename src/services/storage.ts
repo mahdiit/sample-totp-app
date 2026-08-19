@@ -21,7 +21,6 @@ export const storageService = {
       if (!encryptedData) {
         return [];
       }
-
       const encrypted: EncryptedData = JSON.parse(encryptedData);
       const decrypted = encryptionService.decrypt(encrypted);
       return JSON.parse(decrypted);

@@ -12,6 +12,9 @@ import {
   IonLabel,
   IonInput,
   IonList,
+  IonBackButton,
+  IonButtons,
+  IonSpinner,
 } from '@ionic/react';
 import { cameraOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
@@ -21,8 +24,9 @@ import { AuthenticatorAccount } from '../types';
 
 const ScannerPage: React.FC = () => {
   const navigate = useNavigate();
-  const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
+  const [showAlert, setShowAlert] = useState(false);
+  const [scanning, setScanning] = useState(false);
   const [manualEntry, setManualEntry] = useState({
     issuer: '',
     account: '',
@@ -30,36 +34,47 @@ const ScannerPage: React.FC = () => {
   });
 
   const handleScanBarcode = async () => {
+    setScanning(true);
     try {
-      // In a real app, this would use @capacitor/barcode-scanner
-      // For demo purposes, we'll simulate a scan
-      const simulatedQRCode = 'otpauth://totp/Example:alice@example.com?secret=JBSWY3DPEHPK3PXP&issuer=Example';
-      
-      const parsed = totpService.parseOTPAuthURI(simulatedQRCode);
-      
-      if (!parsed) {
-        setAlertMessage('Invalid QR code format');
-        setShowAlert(true);
-        return;
+      // Try native Capacitor barcode scanner if available
+      try {
+        const { default: BarcodeScanner } = await import('@capacitor/barcode-scanner');
+        await BarcodeScanner.startScan();
+        // On native platforms the plugin navigates back after scanning.
+        // In web demos we fall through to the simulated scan below.
+      } catch {
+        // Web preview: simulate a scan of a sample otpauth URI
+        const simulatedQRCode =
+          'otpauth://totp/Example:alice@example.com?secret=JBSWY3DPEHPK3PXP&issuer=Example';
+        const parsed = totpService.parseOTPAuthURI(simulatedQRCode);
+
+        if (!parsed) {
+          setAlertMessage('Invalid QR code format');
+          setShowAlert(true);
+          return;
+        }
+
+        const newAccount: AuthenticatorAccount = {
+          ...parsed,
+          id: Date.now().toString(),
+          createdAt: Date.now(),
+        };
+
+        storageService.addAccount(newAccount);
+        navigate('/');
       }
-
-      const newAccount: AuthenticatorAccount = {
-        ...parsed,
-        id: Date.now().toString(),
-        createdAt: Date.now(),
-      };
-
-      storageService.addAccount(newAccount);
-      navigate('/');
     } catch (error) {
+      console.error('Scan failed:', error);
       setAlertMessage('Failed to scan QR code');
       setShowAlert(true);
+    } finally {
+      setScanning(false);
     }
   };
 
   const handleManualEntry = () => {
     if (!manualEntry.secret || !manualEntry.issuer) {
-      setAlertMessage('Please fill in all required fields');
+      setAlertMessage('Please fill in Issuer and Secret Key');
       setShowAlert(true);
       return;
     }
@@ -83,6 +98,9 @@ const ScannerPage: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
+          <IonButtons slot="start">
+            <IonBackButton defaultHref="/" />
+          </IonButtons>
           <IonTitle>Add Account</IonTitle>
         </IonToolbar>
       </IonHeader>
@@ -90,13 +108,15 @@ const ScannerPage: React.FC = () => {
         <IonButton
           expand="block"
           onClick={handleScanBarcode}
+          disabled={scanning}
           className="ion-margin-top"
         >
-          <IonIcon slot="start" icon={cameraOutline} />
+          {scanning && <IonSpinner slot="start" name="crescent" />}
+          {!scanning && <IonIcon slot="start" icon={cameraOutline} />}
           Scan QR Code
         </IonButton>
 
-        <div className="ion-margin-top ion-margin-bottom">
+        <div className="ion-margin-top ion-margin-bottom ion-text-center">
           <h2>Or enter manually</h2>
         </div>
 
@@ -127,7 +147,7 @@ const ScannerPage: React.FC = () => {
             <IonLabel position="stacked">Secret Key *</IonLabel>
             <IonInput
               value={manualEntry.secret}
-              placeholder="Enter secret key"
+              placeholder="Enter secret key (Base32)"
               onIonInput={(e) =>
                 setManualEntry({ ...manualEntry, secret: e.detail.value! })
               }

@@ -11,7 +11,6 @@ export const totpService = {
       period: account.period,
       secret: OTPAuth.Secret.fromBase32(account.secret),
     });
-
     return totp.generate();
   },
 
@@ -23,15 +22,8 @@ export const totpService = {
   parseOTPAuthURI(uri: string): Omit<AuthenticatorAccount, 'id' | 'createdAt'> | null {
     try {
       const url = new URL(uri);
-      
-      if (url.protocol !== 'otpauth:') {
-        return null;
-      }
-
-      const type = url.hostname;
-      if (type !== 'totp') {
-        return null;
-      }
+      if (url.protocol !== 'otpauth:') return null;
+      if (url.hostname !== 'totp') return null;
 
       const label = decodeURIComponent(url.pathname.slice(1));
       const params = url.searchParams;
@@ -46,17 +38,15 @@ export const totpService = {
       }
 
       const secret = params.get('secret');
-      if (!secret) {
-        return null;
-      }
+      if (!secret) return null;
 
       return {
         issuer: issuer || 'Unknown',
         account: account || 'Unknown',
         secret: secret.toUpperCase(),
         algorithm: (params.get('algorithm') as 'SHA1' | 'SHA256' | 'SHA512') || 'SHA1',
-        digits: parseInt(params.get('digits') || '6') as 6 | 8,
-        period: parseInt(params.get('period') || '30'),
+        digits: parseInt(params.get('digits') || '6', 10) as 6 | 8,
+        period: parseInt(params.get('period') || '30', 10),
       };
     } catch (error) {
       console.error('Failed to parse OTP URI:', error);
