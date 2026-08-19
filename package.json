@@ -1,13 +1,26 @@
 {
+	"scripts": {
+		"dev": "vite",
+		"build": "tsc && vite build",
+		"preview": "vite preview"
+	},
 	"dependencies": {
+		"@capacitor/barcode-scanner": "^3.1.0",
+		"@capacitor/camera": "^8.2.2",
+		"@capacitor/core": "^8.5.0",
 		"@ionic/react": "^8.8.18",
 		"@ionic/react-router": "^8.8.18",
+		"@types/crypto-js": "^4.2.2",
+		"@types/react": "^19.2.18",
+		"@types/react-dom": "^19.2.4",
+		"@vitejs/plugin-react": "^4.3.4",
+		"crypto-js": "^4.2.0",
 		"ionicons": "^8.1.0",
 		"otpauth": "^9.5.1",
-		"crypto-js": "^4.2.0",
-		"@types/crypto-js": "^4.2.2",
-		"@capacitor/core": "^8.5.0",
-		"@capacitor/camera": "^8.2.2",
-		"@capacitor/barcode-scanner": "^3.1.0"
+		"react": "^19.2.8",
+		"react-dom": "^19.2.8",
+		"react-router-dom": "^7.18.2",
+		"typescript": "^7.0.2",
+		"vite": "^5.4.19"
 	}
 }

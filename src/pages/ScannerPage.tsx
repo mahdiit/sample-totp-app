@@ -33,35 +33,49 @@ const ScannerPage: React.FC = () => {
     secret: '',
   });
 
+  const addAccountFromUri = (uri: string): boolean => {
+    const parsed = totpService.parseOTPAuthURI(uri);
+    if (!parsed) {
+      setAlertMessage('Invalid QR code format');
+      setShowAlert(true);
+      return false;
+    }
+    const newAccount: AuthenticatorAccount = {
+      ...parsed,
+      id: Date.now().toString(),
+      createdAt: Date.now(),
+    };
+    storageService.addAccount(newAccount);
+    navigate('/');
+    return true;
+  };
+
   const handleScanBarcode = async () => {
     setScanning(true);
     try {
-      // Try native Capacitor barcode scanner if available
+      // On native platforms, use the Capacitor barcode scanner if it is
+      // available. The scanner API differs across plugin variants, so we
+      // probe for it defensively and fall back to a simulated scan on web.
+      let scanned = false;
       try {
-        const { default: BarcodeScanner } = await import('@capacitor/barcode-scanner');
-        await BarcodeScanner.startScan();
-        // On native platforms the plugin navigates back after scanning.
-        // In web demos we fall through to the simulated scan below.
+        const { default: BarcodeScanner } = (await import(
+          '@capacitor/barcode-scanner'
+        )) as any;
+        if (typeof BarcodeScanner?.startScan === 'function') {
+          const result = await BarcodeScanner.startScan();
+          if (result?.rawText && typeof result.rawText === 'string') {
+            scanned = addAccountFromUri(result.rawText);
+          }
+        }
       } catch {
-        // Web preview: simulate a scan of a sample otpauth URI
+        // Native plugin unavailable (e.g. web preview) -> fall through.
+      }
+
+      // Web preview / fallback: simulate scanning a sample otpauth URI
+      if (!scanned) {
         const simulatedQRCode =
           'otpauth://totp/Example:alice@example.com?secret=JBSWY3DPEHPK3PXP&issuer=Example';
-        const parsed = totpService.parseOTPAuthURI(simulatedQRCode);
-
-        if (!parsed) {
-          setAlertMessage('Invalid QR code format');
-          setShowAlert(true);
-          return;
-        }
-
-        const newAccount: AuthenticatorAccount = {
-          ...parsed,
-          id: Date.now().toString(),
-          createdAt: Date.now(),
-        };
-
-        storageService.addAccount(newAccount);
-        navigate('/');
+        addAccountFromUri(simulatedQRCode);
       }
     } catch (error) {
       console.error('Scan failed:', error);

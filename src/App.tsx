@@ -26,12 +26,9 @@ const App: React.FC = () => (
   <IonApp>
     <IonReactRouter>
       <IonRouterOutlet>
-        <Route exact path="/">
-          <AuthenticatorListPage />
-        </Route>
-        <Route exact path="/scanner">
-          <ScannerPage />
-        </Route>
+        <Route path="/" element={<AuthenticatorListPage />} />
+        <Route path="/scanner" element={<ScannerPage />} />
+        <Route path="*" element={<AuthenticatorListPage />} />
       </IonRouterOutlet>
     </IonReactRouter>
   </IonApp>
