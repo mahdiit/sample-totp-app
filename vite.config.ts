@@ -9,6 +9,10 @@ export default defineConfig({
     // failing to bundle their native entry points.
     exclude: ['@capacitor/core', '@capacitor/camera', '@capacitor/barcode-scanner'],
   },
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true,
+  },
   server: {
     host: true,
     port: 5173,
