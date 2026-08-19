@@ -9,7 +9,6 @@
 		"@capacitor/camera": "^8.2.2",
 		"@capacitor/core": "^8.5.0",
 		"@ionic/react": "^8.8.18",
-		"@ionic/react-router": "^8.8.18",
 		"@types/crypto-js": "^4.2.2",
 		"@types/react": "^19.2.18",
 		"@types/react-dom": "^19.2.4",

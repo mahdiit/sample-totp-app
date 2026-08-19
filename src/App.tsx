@@ -1,6 +1,5 @@
-import { Route } from 'react-router-dom';
-import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
-import { IonReactRouter } from '@ionic/react-router';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { IonApp, setupIonicReact } from '@ionic/react';
 import AuthenticatorListPage from './pages/AuthenticatorListPage';
 import ScannerPage from './pages/ScannerPage';
 
@@ -24,13 +23,13 @@ setupIonicReact();
 
 const App: React.FC = () => (
   <IonApp>
-    <IonReactRouter>
-      <IonRouterOutlet>
+    <BrowserRouter>
+      <Routes>
         <Route path="/" element={<AuthenticatorListPage />} />
         <Route path="/scanner" element={<ScannerPage />} />
         <Route path="*" element={<AuthenticatorListPage />} />
-      </IonRouterOutlet>
-    </IonReactRouter>
+      </Routes>
+    </BrowserRouter>
   </IonApp>
 );
 

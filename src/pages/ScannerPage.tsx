@@ -12,10 +12,10 @@ import {
   IonLabel,
   IonInput,
   IonList,
-  IonBackButton,
   IonButtons,
   IonSpinner,
 } from '@ionic/react';
+import { arrowBackOutline } from 'ionicons/icons';
 import { cameraOutline } from 'ionicons/icons';
 import { useNavigate } from 'react-router-dom';
 import { totpService } from '../services/totp';
@@ -113,7 +113,9 @@ const ScannerPage: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/" />
+            <IonButton onClick={() => navigate(-1)}>
+              <IonIcon slot="icon-only" icon={arrowBackOutline} />
+            </IonButton>
           </IonButtons>
           <IonTitle>Add Account</IonTitle>
         </IonToolbar>
