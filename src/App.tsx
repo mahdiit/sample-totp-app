@@ -29,7 +29,7 @@ const App: React.FC = () => {
   return (
     <IonApp>
       {unlocked ? (
-        <BrowserRouter>
+        <BrowserRouter basename={import.meta.env.BASE_URL}>
           <Routes>
             <Route path="/" element={<AuthenticatorListPage />} />
             <Route path="/scanner" element={<ScannerPage />} />

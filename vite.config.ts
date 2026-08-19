@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig({
+  base: '/sample-totp-app/',
   plugins: [react()],
   optimizeDeps: {
     // Capacitor plugins target native (Android/iOS) and are unused in the
@@ -10,7 +11,7 @@ export default defineConfig({
     exclude: ['@capacitor/core', '@capacitor/camera', '@capacitor/barcode-scanner'],
   },
   build: {
-    outDir: 'dist',
+    outDir: 'docs',
     emptyOutDir: true,
   },
   server: {
